@@ -1,16 +1,10 @@
 {
   "tree": {
-    "department": "INSA",
-    "abbreviation": "",
-    "type": "type1",
-    "collaborators": [],
-    "children": [{
       "department": "DIRETORIA",
       "abbreviation": "",
       "type": "type2",
       "collaborators": [],
-      "children": []
-    }, {
+      "children": [{
       "department": "ADMINISTRAÇÃO",
       "abbreviation": "",
       "type": "type3",
