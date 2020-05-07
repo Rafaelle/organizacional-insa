@@ -34,11 +34,11 @@
   cursor: pointer;
 }
 
-.node-rect {}
+.node-rect {
+}
 
 .node-rect-closed {
   stroke-width: 2px;
-  stroke: rgb(0, 0, 0);
 }
 
 .link {
@@ -89,5 +89,5 @@
 }
 
 .textcolored {
-  color: orange;
+  color: #838383;
 }

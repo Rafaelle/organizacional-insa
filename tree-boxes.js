@@ -27,32 +27,28 @@
 function treeBoxes(urlService, jsonData) {
   var urlService_ = '';
 
-  var blue = '#337ab7',
-    green = '#5cb85c',
-    yellow = '#f0ad4e',
-    blueText = '#4ab1eb',
-    purple = '#9467bd';
+  var gray = '#838383';
   var rectSpacing = 20
 
   var maxDepth = 0;
   var maxTreeWidth = 0;
 
   var margin = {
-      top: 0,
-      right: 0,
-      bottom: 100,
-      left: 0
-    },
+    top: 0,
+    right: 0,
+    bottom: 100,
+    left: 0
+  },
     // Height and width are redefined later in function of the size of the tree
     // (after that the data are loaded)
     width = 800 - margin.right - margin.left,
     height = 400 - margin.top - margin.bottom;
 
   var rectNode = {
-      width: 140,
-      height: 50,
-      textMargin: 5
-    },
+    width: 140,
+    height: 50,
+    textMargin: 5
+  },
     tooltip = {
       width: 150,
       height: 40,
@@ -141,15 +137,15 @@ function treeBoxes(urlService, jsonData) {
     // Check if two nodes are in collision on the ordinates axe and move them
     breadthFirstTraversal(tree.nodes(root), collision);
     // Normalize for fixed-depth
-    nodes.forEach(function(d) {
+    nodes.forEach(function (d) {
       d.y = d.depth * (rectNode.width * 1.5);
     });
 
     // 1) ******************* Update the nodes *******************
-    var node = nodeGroup.selectAll('g.node').data(nodes, function(d) {
+    var node = nodeGroup.selectAll('g.node').data(nodes, function (d) {
       return d.id || (d.id = ++i);
     });
-    var nodesTooltip = nodeGroupTooltip.selectAll('g').data(nodes, function(d) {
+    var nodesTooltip = nodeGroupTooltip.selectAll('g').data(nodes, function (d) {
       return d.id || (d.id = ++i);
     });
 
@@ -160,15 +156,24 @@ function treeBoxes(urlService, jsonData) {
     // hide them
     var nodeEnter = node.enter().insert('g', 'g.node')
       .attr('class', 'node')
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + source.x0 + ',' + source.y0 + ')';
       })
-      .on('click', function(d) {
+      .on('click', function (d) {
         click(d);
       });
 
+    var nodeGroups = svg.selectAll("g")
+      .data(root.descendants())
+      .enter()
+      .append("g")
+      .attr("transform", function (d) {
+        return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")";
+      });
+
+
     var nodeEnterTooltip = nodesTooltip.enter().append('g')
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + source.y0 + ',' + source.x0 + ')';
       });
 
@@ -179,48 +184,46 @@ function treeBoxes(urlService, jsonData) {
       .attr('width', rectNode.width)
       .attr('height', rectNode.height)
       .attr('class', 'node-rect')
-      .attr('fill', function(d) {
-        return d.color;
-      });
+      .attr('fill', gray);
 
     //construção do texto do node
     nodeEnter.append('foreignObject')
       .attr('x', rectNode.textMargin)
       .attr('y', rectNode.textMargin)
-      .attr('width', function() {
+      .attr('width', function () {
         return (rectNode.width - rectNode.textMargin * 2) < 0 ? 0 :
           (rectNode.width - rectNode.textMargin * 2)
       })
-      .attr('height', function() {
+      .attr('height', function () {
         return (rectNode.height - rectNode.textMargin * 2) < 0 ? 0 :
           (rectNode.height - rectNode.textMargin * 2)
       })
-      .append('xhtml').html(function(d) {
+      .append('xhtml').html(function (d) {
 
-				if (d.abbreviation) {
-					return '<div style="width: ' +
-	          (rectNode.width - rectNode.textMargin * 2) + 'px; height: ' +
-	          (rectNode.height - rectNode.textMargin * 2) + 'px;" class="node-text wordwrap">' +
-	          '<b>' + d.department + ' - ' + d.abbreviation + '</b><br></div>';
-				} else {
-					return '<div style="width: ' +
-						(rectNode.width - rectNode.textMargin * 2) + 'px; height: ' +
-						(rectNode.height - rectNode.textMargin * 2) + 'px;" class="node-text wordwrap">' +
-						'<b>' + d.department + '</b><br></div>';
-				}
+        if (d.abbreviation) {
+          return '<div style="width: ' +
+            (rectNode.width - rectNode.textMargin * 2) + 'px; height: ' +
+            (rectNode.height - rectNode.textMargin * 2) + 'px;" class="node-text wordwrap">' +
+            '<b>' + d.department + ' - ' + d.abbreviation + '</b><br></div>';
+        } else {
+          return '<div style="width: ' +
+            (rectNode.width - rectNode.textMargin * 2) + 'px; height: ' +
+            (rectNode.height - rectNode.textMargin * 2) + 'px;" class="node-text wordwrap">' +
+            '<b>' + d.department + '</b><br></div>';
+        }
 
       })
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         $('#nodeInfoID' + d.id).css('visibility', 'visible');
         $('#nodeInfoTextID' + d.id).css('visibility', 'visible');
       })
-      .on('mouseout', function(d) {
+      .on('mouseout', function (d) {
         $('#nodeInfoID' + d.id).css('visibility', 'hidden');
         $('#nodeInfoTextID' + d.id).css('visibility', 'hidden');
       });
 
     nodeEnterTooltip.append("rect")
-      .attr('id', function(d) {
+      .attr('id', function (d) {
         return 'nodeInfoID' + d.id;
       })
       .attr('x', rectNode.width / 2)
@@ -229,19 +232,19 @@ function treeBoxes(urlService, jsonData) {
       .attr('height', tooltip.height)
       .attr('class', 'tooltip-box')
       .style('fill-opacity', 0.8)
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         $('#nodeInfoID' + d.id).css('visibility', 'visible');
         $('#nodeInfoTextID' + d.id).css('visibility', 'visible');
         removeMouseEvents();
       })
-      .on('mouseout', function(d) {
+      .on('mouseout', function (d) {
         $('#nodeInfoID' + d.id).css('visibility', 'hidden');
         $('#nodeInfoTextID' + d.id).css('visibility', 'hidden');
         reactivateMouseEvents();
       });
 
     nodeEnterTooltip.append("text")
-      .attr('id', function(d) {
+      .attr('id', function (d) {
         return 'nodeInfoTextID' + d.id;
       })
       .attr('x', rectNode.width / 2 + tooltip.textMargin)
@@ -251,28 +254,33 @@ function treeBoxes(urlService, jsonData) {
       .attr('class', 'tooltip-text')
       .style('fill', 'white')
       .append("tspan")
-      .text(function(d) {
+      .text(function (d) {
         return 'Name: ' + d.name;
       })
       .append("tspan")
       .attr('x', rectNode.width / 2 + tooltip.textMargin)
       .attr('dy', '1.5em')
-      .text(function(d) {
+      .text(function (d) {
         return 'Info: ' + d.label;
       });
 
     // Transition nodes to their new position.
     var nodeUpdate = node.transition().duration(duration)
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + d.y + ',' + d.x + ')';
       });
+
+
+
+
+
     nodesTooltip.transition().duration(duration)
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + d.y + ',' + d.x + ')';
       });
 
     nodeUpdate.select('rect')
-      .attr('class', function(d) {
+      .attr('class', function (d) {
         return d._children ? 'node-rect-closed' : 'node-rect';
       });
 
@@ -280,13 +288,13 @@ function treeBoxes(urlService, jsonData) {
 
     // Transition exiting nodes to the parent's new position
     var nodeExit = node.exit().transition().duration(duration)
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + source.y + ',' + source.x + ')';
       })
       .remove();
 
     nodesTooltip.exit().transition().duration(duration)
-      .attr('transform', function(d) {
+      .attr('transform', function (d) {
         return 'translate(' + source.y + ',' + source.x + ')';
       })
       .remove();
@@ -294,11 +302,11 @@ function treeBoxes(urlService, jsonData) {
     nodeExit.select('text').style('fill-opacity', 1e-6);
 
     // 2) ******************* Update the links *******************
-    var link = linkGroup.selectAll('path').data(links, function(d) {
+    var link = linkGroup.selectAll('path').data(links, function (d) {
       return d.target.id;
     });
-    d3.selection.prototype.moveToFront = function() {
-      return this.each(function() {
+    d3.selection.prototype.moveToFront = function () {
+      return this.each(function () {
         this.parentNode.appendChild(this);
       });
     };
@@ -308,7 +316,7 @@ function treeBoxes(urlService, jsonData) {
       .attr('class', 'link');
     // Transition links to their new position.
     var linkUpdate = link.transition().duration(duration)
-      .attr('d', function(d) {
+      .attr('d', function (d) {
         return diagonal(d);
       });
 
@@ -317,7 +325,7 @@ function treeBoxes(urlService, jsonData) {
       .remove();
 
     // Stash the old positions for transition.
-    nodes.forEach(function(d) {
+    nodes.forEach(function (d) {
       d.x0 = d.x;
       d.y0 = d.y;
     });
@@ -409,9 +417,9 @@ function treeBoxes(urlService, jsonData) {
   //Desenho dos links
   function diagonal(d) {
     var p0 = {
-        x: d.source.x + rectNode.height / 2,
-        y: (d.source.y + rectNode.width)
-      },
+      x: d.source.x + rectNode.height / 2,
+      y: (d.source.y + rectNode.width)
+    },
       p3 = {
         x: d.target.x + rectNode.height / 2,
         //y : d.target.y  - 12 // -12, so the end arrows are just before the rect node (se tiver seta)
@@ -422,10 +430,10 @@ function treeBoxes(urlService, jsonData) {
         x: p0.x,
         y: m
       }, {
-        x: p3.x,
-        y: m
-      }, p3];
-    p = p.map(function(d) {
+          x: p3.x,
+          y: m
+        }, p3];
+    p = p.map(function (d) {
       return [d.y, d.x];
     });
     return 'M' + p[0] + 'C' + p[1] + ' ' + p[2] + ' ' + p[3];
@@ -446,18 +454,9 @@ function treeBoxes(urlService, jsonData) {
     // breadthFirstTraversal returns the max number of node on a same level
     // and colors the nodes
     maxDepth = 0;
-    maxTreeWidth = breadthFirstTraversal(nodes(root), function(currentLevel) {
+    maxTreeWidth = breadthFirstTraversal(nodes(root), function (currentLevel) {
       maxDepth++;
-      currentLevel.forEach(function(node) {
-        if (node.type == 'type1')
-          node.color = yellow;
-        if (node.type == 'type2')
-          node.color = purple;
-        if (node.type == 'type3')
-          node.color = blue;
-        if (node.type == 'type4')
-          node.color = green;
-      });
+
     });
     height = maxTreeWidth * (rectNode.height + 5) + tooltip.height + 20 - margin.right - margin.left;
     width = maxDepth * (rectNode.width * 1.5) + tooltip.width / 2 - margin.top - margin.bottom;
