@@ -94,8 +94,18 @@ function treeBoxes(urlService, jsonData) {
     root.fixed = true;
 
     //colapsar
-    //root.children.forEach(collapse);
     calculateTreeWidth(tree.nodes, root);
+    root.children.forEach(collapse);
+
+
+    // Collapse the node and all it's children
+function collapse(d) {
+  if(d.children) {
+    d._children = d.children
+    d._children.forEach(collapse)
+    d.children = null
+  }
+}
 
     baseSvg = d3.select('#tree-container').append('svg')
       .attr('width', width + margin.right + margin.left)
